@@ -1,6 +1,6 @@
 ﻿import Internal_DataLoader from "./utils/internal_dataloader";
 import Internal_DataLoaderNode from "./utils/internal_dataloadernode";
-import {CompilationPlaylists, GameMedia, LiveData, MediaItem, PlayerListResponse, VideoSearchResults, VideoSearchWithMetadata} from "../contract";
+import {CompilationPlaylists, GameMedia, IHighlightSearchItem, LiveData, MediaItem, PlayerListResponse, VideoSearchResults, VideoSearchWithMetadata} from "../contract";
 import moment from "moment";
 import {ISchedule, IScheduleGameList, ITeamDetails} from "../contract/teamschedule";
 import {Standings} from "../contract/standings";
@@ -223,4 +223,15 @@ export class MlbDataServer
 
 	public videoPlaylistSearchNode = (tag: CompilationPlaylists, page = 1) => this.videoPlaylistSearchIso(tag, page, true);
 	public videoPlaylistSearch = (tag: CompilationPlaylists, page = 1) => this.videoPlaylistSearchIso(tag, page, false);
+
+	public async videoLocalSearch(text: string, page = 0, gameIds?: string)
+	{
+		let url = `/api/search?text=${text}&page=${page}`;
+		if (gameIds)
+		{
+			url += `&gameIds=${gameIds}`;
+		}
+
+		return await fetch(url).then(r => r.json()) as IHighlightSearchItem[];
+	}
 }

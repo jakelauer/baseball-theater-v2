@@ -3,6 +3,7 @@ import {Express} from "express";
 import {NextFunction, Request, Response} from "express-serve-static-core";
 import {Auth} from "./auth";
 import {isProd} from "../config/config";
+import {Search} from "./search";
 
 export const RegisterLocalEndpoints = (app: Express, clientFolder: string) =>
 {
@@ -21,6 +22,24 @@ export const RegisterLocalEndpoints = (app: Express, clientFolder: string) =>
 			{
 				res.send(json);
 			});
+	});
+
+	app.get("/api/search", (req, res) =>
+	{
+		const text: string = req.query.text;
+		const gameIds = req.query.gameIds?.split(",")?.map((s: string) => parseInt(s));
+		const page = parseInt(req.query.page);
+
+		try
+		{
+			const results = Search.doSearch({text, gameIds}, page) ?? [];
+
+			res.send(results);
+		}
+		catch (e)
+		{
+			throw e;
+		}
 	});
 
 	app.get("/auth/authorize", (req, res) =>

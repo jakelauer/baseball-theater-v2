@@ -7,6 +7,7 @@ import styles from "./TeamsArea.module.scss";
 import {Highlight} from "../../UI/Highlight";
 import {ContainerProgress} from "../../UI/ContainerProgress";
 import Typography from "@material-ui/core/Typography";
+import {AuthIntercom, BackerType, IAuthContext} from "../../Global/AuthIntercom";
 
 interface ITeamsAreaProps
 {
@@ -24,6 +25,7 @@ interface ITeamsAreaState
 	videos: VideoSearchWithMetadata[];
 	page: number;
 	loading: boolean;
+	authContext: IAuthContext;
 }
 
 class TeamsArea extends React.Component<Props, State>
@@ -37,7 +39,8 @@ class TeamsArea extends React.Component<Props, State>
 		this.state = {
 			videos: [],
 			page: 1,
-			loading: true
+			loading: true,
+			authContext: AuthIntercom.state
 		};
 	}
 
@@ -58,6 +61,13 @@ class TeamsArea extends React.Component<Props, State>
 				})
 			}
 		});
+
+		AuthIntercom.listen(state =>
+		{
+			this.setState({
+				authContext: state
+			});
+		})
 	}
 
 	public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void
@@ -98,6 +108,11 @@ class TeamsArea extends React.Component<Props, State>
 
 	public render()
 	{
+		if (!AuthIntercom.hasLevel(BackerType.ProBacker))
+		{
+			return "Requires Pro Backer";
+		}
+
 		const team = Teams.TeamList[this.props.match.params.teamFileCode as keyof ITeams];
 
 		return (
