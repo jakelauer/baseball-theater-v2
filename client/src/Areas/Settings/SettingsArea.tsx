@@ -9,7 +9,7 @@ import ListItem from "@material-ui/core/ListItem";
 import Select from "@material-ui/core/Select";
 import {ITeams, Teams} from "baseball-theater-engine";
 import MenuItem from "@material-ui/core/MenuItem";
-import {ISettingsIntercomPayload, SettingsIntercom} from "../../Global/Settings/SettingsIntercom";
+import {ISettingsDataStorePayload, SettingsDataStore} from "../../Global/Settings/SettingsDataStore";
 import Checkbox from "@material-ui/core/Checkbox";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
@@ -27,7 +27,7 @@ type State = ISettingsAreaState;
 
 interface ISettingsAreaState
 {
-	settings: ISettingsIntercomPayload;
+	settings: ISettingsDataStorePayload;
 }
 
 export default class SettingsArea extends React.Component<Props, State>
@@ -37,25 +37,30 @@ export default class SettingsArea extends React.Component<Props, State>
 		super(props);
 
 		this.state = {
-			settings: SettingsIntercom.state
+			settings: SettingsDataStore.state
 		};
 	}
 
 	public componentDidMount(): void
 	{
-		SettingsIntercom.listen(data => this.setState({
+		SettingsDataStore.listen(data => this.setState({
 			settings: data
 		}));
 	}
 
 	private readonly handleTeamsChange = (event: React.ChangeEvent<{ value: unknown }>) =>
 	{
-		SettingsIntercom.setFavoriteTeams(event.target.value as (keyof ITeams)[]);
+		SettingsDataStore.setFavoriteTeams(event.target.value as (keyof ITeams)[]);
 	};
 
 	private readonly handleHideScoresChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 	{
-		SettingsIntercom.setHideScores(event.target.checked);
+		SettingsDataStore.setHideScores(event.target.checked);
+	};
+
+	private readonly handleShowDescriptionsChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+	{
+		SettingsDataStore.setShowDescriptions(event.target.checked);
 	};
 
 	public render()
@@ -67,17 +72,6 @@ export default class SettingsArea extends React.Component<Props, State>
 				</Typography>
 				<List>
 
-					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
-						<ListItemText primary={"Hide Scores"}/>
-						<ListItemSecondaryAction>
-							<Switch
-								value={this.state.settings.hideScores}
-								checked={this.state.settings.hideScores}
-								onChange={this.handleHideScoresChange}
-								edge="end"
-							/>
-						</ListItemSecondaryAction>
-					</ListItem>
 
 					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
 						<ListItemText primary={"Favorite Teams"}/>
@@ -114,8 +108,28 @@ export default class SettingsArea extends React.Component<Props, State>
 						</ListItemSecondaryAction>
 					</ListItem>
 
-					<ListItem>
-						<ListItemText primary={"Sort"}/>
+					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
+						<ListItemText primary={"Hide Scores"}/>
+						<ListItemSecondaryAction>
+							<Switch
+								value={this.state.settings.hideScores}
+								checked={this.state.settings.hideScores}
+								onChange={this.handleHideScoresChange}
+								edge="end"
+							/>
+						</ListItemSecondaryAction>
+					</ListItem>
+
+					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
+						<ListItemText primary={"Show Highlight Descriptions"}/>
+						<ListItemSecondaryAction>
+							<Switch
+								value={this.state.settings.highlightDescriptions}
+								checked={this.state.settings.highlightDescriptions}
+								onChange={this.handleShowDescriptionsChange}
+								edge="end"
+							/>
+						</ListItemSecondaryAction>
 					</ListItem>
 				</List>
 			</Container>

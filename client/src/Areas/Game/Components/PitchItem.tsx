@@ -5,7 +5,7 @@ import {LiveGamePlayEvent} from "baseball-theater-engine";
 import {MdVideoLibrary} from "react-icons/all";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import classNames from "classnames";
-import {AuthIntercom, BackerType, IAuthContext} from "../../../Global/AuthIntercom";
+import {AuthDataStore, BackerType, IAuthContext} from "../../../Global/AuthDataStore";
 import Tooltip from "@material-ui/core/Tooltip";
 
 interface IPitchItemProps
@@ -53,7 +53,7 @@ export class PitchItem extends React.Component<Props, State>
 			</div>
 		);
 
-		const authed = AuthIntercom.hasLevel(BackerType.ProBacker);
+		const authed = AuthDataStore.hasLevel(BackerType.ProBacker);
 		const href = authed ? `https://baseballsavant.mlb.com/sporty-videos?playId=${pitch.playId}` : "#";
 		const linkClasses = classNames(styles.videoLink, {
 			[styles.unauthed]: !authed

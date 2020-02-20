@@ -7,7 +7,7 @@ import styles from "./PlayItem.module.scss";
 import {ExpandLess, ExpandMore} from "@material-ui/icons";
 import {MdVideoLibrary} from "react-icons/all";
 import Avatar from "@material-ui/core/Avatar";
-import {AuthIntercom, BackerType, IAuthContext} from "../../../Global/AuthIntercom";
+import {AuthDataStore, BackerType, IAuthContext} from "../../../Global/AuthDataStore";
 import classNames from "classnames";
 import Tooltip from "@material-ui/core/Tooltip";
 
@@ -37,13 +37,13 @@ export class PlayItem extends React.Component<Props, State>
 
 		this.state = {
 			expanded: false,
-			auth: AuthIntercom.state
+			auth: AuthDataStore.state
 		};
 	}
 
 	public componentDidMount(): void
 	{
-		AuthIntercom.listen(auth => this.setState({auth}));
+		AuthDataStore.listen(auth => this.setState({auth}));
 	}
 
 	private toggle = () => this.setState({
@@ -66,7 +66,7 @@ export class PlayItem extends React.Component<Props, State>
 		const playEventsLength = this.props.play?.playEvents?.length ?? 1;
 		const playId = this.props.play.playEvents?.[playEventsLength - 1]?.playId;
 
-		const authed = AuthIntercom.hasLevel(BackerType.ProBacker);
+		const authed = AuthDataStore.hasLevel(BackerType.ProBacker);
 		const href = authed ? `https://baseballsavant.mlb.com/sporty-videos?playId=${playId}` : "#";
 		const avatarClasses = classNames(styles.videoAvatar, {
 			[styles.unauthed]: !authed

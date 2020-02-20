@@ -1,7 +1,7 @@
 import * as React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import {IAuthContext} from "../Global/AuthIntercom";
+import {IAuthContext} from "../Global/AuthDataStore";
 import styles from "./App.module.scss";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";

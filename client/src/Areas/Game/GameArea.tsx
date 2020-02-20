@@ -2,16 +2,16 @@ import * as React from "react";
 import styles from "./GameArea.module.scss";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import {RouteComponentProps, withRouter} from "react-router";
+import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import {GameTabs, IGameParams, SiteRoutes} from "../../Global/Routes/Routes";
 import {Wrap} from "./Wrap";
 import {LiveGame} from "./LiveGame";
 import {BoxScore} from "./BoxScore";
 import {Highlights} from "./Highlights";
-import {GameIntercom, IGameIntercomState} from "./Components/GameIntercom";
+import {GameDataStore, IGameDataStorePayload} from "./Components/GameDataStore";
 import {CircularProgress, Tabs} from "@material-ui/core";
 import {Respond} from "../../Global/Respond/Respond";
-import {RespondSizes} from "../../Global/Respond/RespondIntercom";
+import {RespondSizes} from "../../Global/Respond/RespondDataStore";
 import {LibraryBooks, ListAlt, PlayCircleOutline, Update} from "@material-ui/icons";
 import {Link} from "react-router-dom";
 import Tab from "@material-ui/core/Tab";
@@ -30,18 +30,18 @@ type State = IGameAreaState;
 interface IGameAreaState
 {
 	tabValue: string;
-	gameData: IGameIntercomState;
+	gameData: IGameDataStorePayload;
 }
 
 class GameArea extends React.Component<Props, State>
 {
-	private readonly gameIntercom: GameIntercom;
+	private readonly gameIntercom: GameDataStore;
 
 	constructor(props: Props)
 	{
 		super(props);
 
-		this.gameIntercom = new GameIntercom(this.props.match.params.gameId);
+		this.gameIntercom = new GameDataStore(this.props.match.params.gameId);
 
 		this.state = {
 			tabValue: props.match.params.tab,
@@ -101,11 +101,19 @@ class GameArea extends React.Component<Props, State>
 	private getTab(tab: GameTabs)
 	{
 		const gameId = this.props.match.params.gameId;
-		return SiteRoutes.Game.resolve({gameId, tab});
+		return SiteRoutes.Game.resolve({gameId, tab, gameDate: "_"});
 	}
 
 	public render()
 	{
+		if (!this.props.match.params.tab)
+		{
+			return <Redirect to={SiteRoutes.Game.resolve({
+				...this.props.match.params,
+				tab: "Highlights"
+			})}/>;
+		}
+
 		const wrapLink = this.getTab("Wrap");
 		const liveGameLink = this.getTab("LiveGame");
 		const boxScoreLink = this.getTab("BoxScore");
@@ -148,9 +156,9 @@ class GameArea extends React.Component<Props, State>
 				<Respond at={RespondSizes.medium} hide={true}>
 					<Tabs
 						className={styles.tabs}
-						centered={true}
 						value={this.state.tabValue}
 						onChange={this.handleChange}
+						centered={true}
 						indicatorColor={"primary"}
 						textColor="primary"
 					>

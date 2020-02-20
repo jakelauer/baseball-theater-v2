@@ -1,16 +1,20 @@
 import * as React from "react";
-import {MediaItem} from "baseball-theater-engine";
+import {MediaItem, MediaItemPlayback} from "baseball-theater-engine";
 import {Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@material-ui/core";
 import styles from "./Highlight.module.scss";
 import {Respond} from "../Global/Respond/Respond";
 import classNames from "classnames";
 import Skeleton from "@material-ui/lab/Skeleton";
-import {RespondSizes} from "../Global/Respond/RespondIntercom";
+import {RespondSizes} from "../Global/Respond/RespondDataStore";
+import CardHeader from "@material-ui/core/CardHeader";
+import moment from "moment";
+import {SettingsDataStore} from "../Global/Settings/SettingsDataStore";
 
 interface IHighlightProps
 {
 	media?: MediaItem;
 	className?: string;
+	showExtra?: boolean;
 }
 
 interface DefaultProps
@@ -47,8 +51,7 @@ export class Highlight extends React.Component<Props, State>
 
 	private get defaultVideo()
 	{
-		return this.props.media?.playbacks?.filter(a => a.url.includes(".mp4"))[0]
-			|| undefined;
+		return this.props.media?.playbacks?.filter(a => a.url.includes(".mp4"))[0];
 	}
 
 	private getKLabel(url: string, alt: string)
@@ -64,7 +67,16 @@ export class Highlight extends React.Component<Props, State>
 	{
 		const {media, loading} = this.props;
 
-		const mp4s = media && media.playbacks && media.playbacks.filter(a => a.url.includes(".mp4")) || [];
+		if (!media)
+		{
+			return null;
+		}
+
+		let mp4s = media && media.playbacks && media.playbacks.filter(a => a.url.includes(".mp4")) || [];
+		mp4s = mp4s.reduce((unique, item) =>
+		{
+			return unique.find(a => a.url === item.url) ? unique : [...unique, item];
+		}, [] as MediaItemPlayback[]);
 
 		const actions = (
 			<CardActions>
@@ -81,8 +93,21 @@ export class Highlight extends React.Component<Props, State>
 			</CardActions>
 		);
 
+		const mediaTitle = media?.title ?? "";
+
+		let title = mediaTitle.match(/recap/gi) ?? false
+			? "Recap"
+			: mediaTitle.match(/cg/gi) ?? false
+				? "Condensed Game"
+				: media?.title;
+
+		const dateString = moment(media.date).format("MMM D, YYYY");
+
 		return (
 			<Card className={classNames(this.props.className, styles.highlight)}>
+				<CardHeader subheader={dateString} title={title} titleTypographyProps={{
+					variant: "h6"
+				}}/>
 				{this.defaultVideo && !loading ?
 					<a href={this.defaultVideo.url} target={"_blank"}>
 						<CardMedia
@@ -96,22 +121,19 @@ export class Highlight extends React.Component<Props, State>
 				}
 				<div className={styles.meta}>
 					<CardActionArea className={styles.actionArea}>
-						<CardContent>
-							{!loading && this.defaultVideo &&
-                            <a href={this.defaultVideo.url} target={"_blank"}>
-                                <Typography gutterBottom variant="h5" component="h2" className={styles.title}>
-	                                {media.title}
-                                </Typography>
-                                <Respond at={RespondSizes.medium} hide={true}>
-                                    <Typography variant="body2" color="textSecondary" component="p">
-			                            {media.description}
-                                    </Typography>
-                                </Respond>
-                            </a>
-							}
-						</CardContent>
+						{!loading && this.defaultVideo && SettingsDataStore.state.highlightDescriptions && (
+							<CardContent>
+								<a href={this.defaultVideo.url} target={"_blank"}>
+									<Respond at={RespondSizes.medium} hide={true}>
+										<Typography variant="body2" color="textSecondary" component="p">
+											{media.description}
+										</Typography>
+									</Respond>
+								</a>
+							</CardContent>
+						)}
 					</CardActionArea>
-						{actions}
+					{actions}
 				</div>
 			</Card>
 		);

@@ -69,8 +69,17 @@ const SearchArea: React.FC<Props> = (props) =>
 	const textUpdate = (newText: string) =>
 	{
 		setText(newText);
-		setPage(0);
-		doSearch(newText, 0, []);
+
+		if (newText.length > 2)
+		{
+			setPage(0);
+			doSearch(newText, 0, []);
+		}
+		else
+		{
+			setHighlights([]);
+			setHasMore(false);
+		}
 	};
 
 	const updatePage = () =>
@@ -107,11 +116,12 @@ const SearchArea: React.FC<Props> = (props) =>
 		}, 500);
 	};
 
-	const videosOrSkeleton = highlights.length ? highlights : Array(text?.length ?? 0 > 0 ? 20 : 0).fill(0);
+	const videosOrSkeleton = highlights.length ? highlights : Array(text.length > 2 ? 20 : 0).fill(0);
+
 
 	const highlightsRendered = videosOrSkeleton.map(item => (
 		<Grid key={item.guid} item xs={12} sm={12} md={6} lg={4} xl={3}>
-			<Highlight media={item?.highlight} className={styles.highlight}/>
+			<Highlight media={item?.highlight} className={styles.highlight} showExtra={true}/>
 		</Grid>
 	));
 

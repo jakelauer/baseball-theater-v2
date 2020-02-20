@@ -1,16 +1,16 @@
-import {Intercom} from "../../../Global/Intercom/intercom";
+import {DataStore} from "../../../Global/Intercom/DataStore";
 import moment from "moment";
 import {GameMedia, LiveData} from "baseball-theater-engine";
 import {MlbClientDataFetcher} from "../../../Global/Mlb/MlbClientDataFetcher";
 
-export interface IGameIntercomState
+export interface IGameDataStorePayload
 {
 	updateTime: moment.Moment;
 	liveData: LiveData;
 	media: GameMedia;
 }
 
-export class GameIntercom extends Intercom<IGameIntercomState>
+export class GameDataStore extends DataStore<IGameDataStorePayload>
 {
 	private interval: number = null;
 

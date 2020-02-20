@@ -108,7 +108,7 @@ export class MlbDataServer
 		const dateString = now.format("YYYY-MM-DD");
 		season = !season ? now.year() : season;
 
-		const url = `https://statsapi.mlb.com/api/v1/teams/${teamId}?hydrate=previousSchedule(date=${dateString},season=${season},limit=162,team,linescore(matchup,runners),decisions,person,stats,seriesStatus(useOverride=true)),nextSchedule(date=${dateString},season=${season},limit=162,team,linescore(matchup,runners),decisions,person,stats,seriesStatus(useOverride=true))`;
+		const url = `https://statsapi.mlb.com/api/v1/teams/${teamId}?hydrate=previousSchedule(date=${dateString},season=${season},limit=162,team,linescore(matchup),decisions,person),nextSchedule(date=${dateString},season=${season},limit=162,team,linescore(matchup,runners),decisions,person)`;
 		return await Internal_DataLoader.load<ISchedule>(
 			url,
 			"schedule" + teamId

@@ -3,7 +3,7 @@ import styles from "./App.module.scss";
 import List from "@material-ui/core/List";
 import SportsBaseball from '@material-ui/icons/SportsBaseball';
 import SettingsIcon from '@material-ui/icons/Settings';
-import {Equalizer, ExpandLess, ExpandMore, PlayCircleFilled, Search} from "@material-ui/icons";
+import {Equalizer, Search} from "@material-ui/icons";
 import EventIcon from "@material-ui/icons/Event";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -11,17 +11,18 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {Link, RouteComponentProps, withRouter} from "react-router-dom";
 import {SiteRoutes} from "../Global/Routes/Routes";
 import {Teams} from "baseball-theater-engine";
-import {AuthIntercom, BackerType, IAuthContext} from "../Global/AuthIntercom";
+import {AuthDataStore, BackerType, IAuthContext} from "../Global/AuthDataStore";
 import cookies from "browser-cookies";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {Button, ListItemAvatar} from "@material-ui/core";
 import Collapse from "@material-ui/core/Collapse";
-import {ISettingsIntercomPayload, SettingsIntercom} from "../Global/Settings/SettingsIntercom";
+import {ISettingsDataStorePayload, SettingsDataStore} from "../Global/Settings/SettingsDataStore";
 import classNames from "classnames";
 import {FaVideo, FiDownloadCloud} from "react-icons/all";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 import {ServiceWorkerUpdate} from "../Global/ServiceWorkerUpdate";
+import Divider from "@material-ui/core/Divider";
 
 interface ISidebarProps extends RouteComponentProps
 {
@@ -57,7 +58,7 @@ type State = ISidebarState;
 interface ISidebarState
 {
 	videoTagsOpen: boolean;
-	settings: ISettingsIntercomPayload;
+	settings: ISettingsDataStorePayload;
 	authContext: IAuthContext;
 	waitingForUpdate: boolean;
 }
@@ -70,8 +71,8 @@ class Sidebar extends React.Component<Props, State>
 
 		this.state = {
 			videoTagsOpen: false,
-			settings: SettingsIntercom.state,
-			authContext: AuthIntercom.state,
+			settings: SettingsDataStore.state,
+			authContext: AuthDataStore.state,
 			waitingForUpdate: false
 		};
 	}
@@ -105,13 +106,17 @@ class Sidebar extends React.Component<Props, State>
 		cookies.erase("token");
 		cookies.erase("token_expiry");
 
-		AuthIntercom.refresh();
+		AuthDataStore.refresh();
 	};
 
 	public componentDidMount(): void
 	{
-		AuthIntercom.listen(data => this.setState({
+		AuthDataStore.listen(data => this.setState({
 			authContext: data
+		}));
+
+		SettingsDataStore.listen(data => this.setState({
+			settings: data
 		}));
 
 		this.checkUpdates();
@@ -132,7 +137,7 @@ class Sidebar extends React.Component<Props, State>
 		const {videoTagsOpen} = this.state;
 		const {authContext, onNavigate} = this.props;
 
-		const isStarBacker = AuthIntercom.hasLevel(BackerType.StarBacker);
+		const isStarBacker = AuthDataStore.hasLevel(BackerType.StarBacker);
 
 		return (
 			<>
@@ -141,23 +146,31 @@ class Sidebar extends React.Component<Props, State>
 				</Link>
 				<List component={"nav"}>
 					{this.state.waitingForUpdate && (
-						<Tooltip title={"Click to update"}>
-							<MenuItem onClick={ServiceWorkerUpdate.update} icon={<FiDownloadCloud/>} textStyle={{color: "#ce0f0f"}}>
-								New Version Available
-							</MenuItem>
-						</Tooltip>
+						<React.Fragment>
+							<Tooltip title={"Click to update"}>
+								<MenuItem onClick={ServiceWorkerUpdate.update} icon={<FiDownloadCloud/>} textStyle={{color: "#ce0f0f"}}>
+									New Version Available
+								</MenuItem>
+							</Tooltip>
+							<Divider/>
+						</React.Fragment>
+					)}
+					{isStarBacker && this.state.settings.favoriteTeams.length > 0 && (
+						<React.Fragment>
+							{this.state.settings.favoriteTeams.map(team => (
+								<MenuItem key={team} onClick={onNavigate} icon={<SportsBaseball/>} path={SiteRoutes.Team.resolve({team})}>
+									{Teams.TeamList[team]}
+								</MenuItem>
+							))}
+							<Divider/>
+						</React.Fragment>
 					)}
 					<MenuItem onClick={onNavigate} icon={<EventIcon/>} path={SiteRoutes.Games.resolve()}>
 						Games
 					</MenuItem>
-					{isStarBacker && this.state.settings.favoriteTeams.map(team => (
-						<MenuItem key={team} onClick={onNavigate} icon={<SportsBaseball/>} path={SiteRoutes.Team.resolve({team})}>
-							{Teams.TeamList[team]}
-						</MenuItem>
-					))}
-					<MenuItem icon={<PlayCircleFilled/>} end={videoTagsOpen ? <ExpandLess/> : <ExpandMore/>} onClick={this.onFeaturedVideosClick}>
-						Highlights
-					</MenuItem>
+					{/*<MenuItem icon={<PlayCircleFilled/>} end={videoTagsOpen ? <ExpandLess/> : <ExpandMore/>} onClick={this.onFeaturedVideosClick}>
+					 Highlights
+					 </MenuItem>*/}
 					<Collapse in={videoTagsOpen} timeout="auto">
 						<List component="div" disablePadding>
 							<ListItem onClick={onNavigate} button component={p => <Link {...p} to={SiteRoutes.FeaturedVideos.resolve({category: "Recap"})}/>}>
