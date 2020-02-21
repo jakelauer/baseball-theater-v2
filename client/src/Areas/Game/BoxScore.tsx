@@ -103,7 +103,7 @@ export class BoxScore extends React.Component<Props, State>
 						{teamsRendered}
 					</Respond>
 				</div>
-				<div style={{padding: 16}}>
+				<div style={{padding: 16, fontSize: 13}}>
 					{boxscore.info.map(data => (
 						<div>
 							<strong>{data.label}: </strong>

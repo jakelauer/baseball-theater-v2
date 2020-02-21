@@ -7,6 +7,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import classNames from "classnames";
 import {AuthDataStore, BackerType, IAuthContext} from "../../../Global/AuthDataStore";
 import Tooltip from "@material-ui/core/Tooltip";
+import {GameDataStoreContext} from "./GameDataStore";
 
 interface IPitchItemProps
 {
@@ -62,42 +63,46 @@ export class PitchItem extends React.Component<Props, State>
 		const tooltip = (
 			<div style={{textAlign: "center", fontSize: "0.8rem"}}>
 				<div>Video of play</div>
-				{!authed && <i>(Pro Backers Only)</i>}
 			</div>
 		);
 
 		return (
-			<ListItem>
-				<ListItemAvatar className={styles.pitchNumber}>
-					<span style={{backgroundColor: pitch.details.ballColor}}>{pitch.pitchNumber}</span>
-				</ListItemAvatar>
-				<ListItemText
-					primary={pitch.details.description}
-					secondary={secondary}
-				/>
-				{pitch.playId &&
-                <ListItemSecondaryAction>
-                    <Tooltip arrow title={tooltip} enterTouchDelay={0}>
-                        <a
-                            target={"_blank"}
-                            className={linkClasses}
-                            href={href}
-                            onClick={e =>
-			                {
-				                e.stopPropagation();
-				                if (!authed)
-				                {
-					                e.preventDefault();
-								}
-							}}
-                            style={{fontSize: "1.5rem"}}
-                        >
-                            <MdVideoLibrary/>
-                        </a>
-                    </Tooltip>
-                </ListItemSecondaryAction>
-				}
-			</ListItem>
+			<GameDataStoreContext.Consumer>
+				{gameDataStore => (<>
+					<ListItem>
+						<ListItemAvatar className={styles.pitchNumber}>
+							<span style={{backgroundColor: pitch.details.ballColor}}>{pitch.pitchNumber}</span>
+						</ListItemAvatar>
+						<ListItemText
+							primary={pitch.details.description}
+							secondary={secondary}
+						/>
+						{pitch.playId &&
+                        <ListItemSecondaryAction>
+                            <Tooltip arrow title={tooltip} enterTouchDelay={0}>
+                                <a
+                                    target={"_blank"}
+                                    className={linkClasses}
+                                    href={href}
+                                    onClick={e =>
+									{
+										e.stopPropagation();
+										if (!authed)
+										{
+											gameDataStore.showUpsell(BackerType.ProBacker);
+											e.preventDefault();
+										}
+									}}
+                                    style={{fontSize: "1.5rem"}}
+                                >
+                                    <MdVideoLibrary/>
+                                </a>
+                            </Tooltip>
+                        </ListItemSecondaryAction>
+						}
+					</ListItem>
+				</>)}
+			</GameDataStoreContext.Consumer>
 		);
 	}
 }

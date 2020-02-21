@@ -133,7 +133,7 @@ const Batter = ({player, fullPlayer}: IPlayerItem) =>
 			<td className={playerClasses}>
 				<strong>{player.stats.batting.note}</strong>
 				<a href={`https://www.mlb.com/player/${player.person.id}`} target={"_blank"} rel={"noreferrer nofollow"}>
-					{fullPlayer.lastName}
+					{fullPlayer.lastName} (<span>{player.allPositions.map(a => a.abbreviation).join("-")}</span>)
 				</a>
 			</td>
 			<td>{player.stats.batting.atBats || 0}</td>

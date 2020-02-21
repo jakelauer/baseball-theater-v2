@@ -10,6 +10,7 @@ import Avatar from "@material-ui/core/Avatar";
 import {AuthDataStore, BackerType, IAuthContext} from "../../../Global/AuthDataStore";
 import classNames from "classnames";
 import Tooltip from "@material-ui/core/Tooltip";
+import {GameDataStoreContext} from "./GameDataStore";
 
 interface IPlayItemProps
 {
@@ -74,51 +75,53 @@ export class PlayItem extends React.Component<Props, State>
 		const tooltip = (
 			<div style={{textAlign: "center", fontSize: "0.8rem"}}>
 				<div>Video of play</div>
-				{!authed && <i>(Pro Backers Only)</i>}
 			</div>
 		);
 
 		return (
-			<React.Fragment>
-				<ListItem button onClick={this.toggle}>
-					<ListItemAvatar>
-						{playId &&
-                        <Tooltip title={tooltip} arrow enterTouchDelay={0}>
-                            <Avatar className={avatarClasses}>
-                                <a target={"_blank"} href={href}
-                                   onClick={e =>
-								   {
-									   e.stopPropagation();
-									   if (!authed)
+			<GameDataStoreContext.Consumer>
+				{gameDataStore => (<>
+					<ListItem button onClick={this.toggle}>
+						<ListItemAvatar>
+							{playId &&
+                            <Tooltip title={tooltip} arrow enterTouchDelay={0}>
+                                <Avatar className={avatarClasses}>
+                                    <a target={"_blank"} href={href}
+                                       onClick={e =>
 									   {
-										   e.preventDefault();
-									   }
-								   }}>
-                                    <MdVideoLibrary/>
-                                </a>
-                            </Avatar>
-                        </Tooltip>
-						}
-					</ListItemAvatar>
-					<ListItemText
-						primary={result.event}
-						secondary={result.description}
-					/>
-					<ListItemSecondaryAction>
-						<div className={styles.actions}>
-							{this.state.expanded ? <ExpandLess/> : <ExpandMore/>}
+										   e.stopPropagation();
+										   if (!authed)
+										   {
+											   gameDataStore.showUpsell(BackerType.ProBacker);
+											   e.preventDefault();
+										   }
+									   }}>
+                                        <MdVideoLibrary/>
+                                    </a>
+                                </Avatar>
+                            </Tooltip>
+							}
+						</ListItemAvatar>
+						<ListItemText
+							primary={result.event}
+							secondary={result.description}
+						/>
+						<ListItemSecondaryAction>
+							<div className={styles.actions}>
+								{this.state.expanded ? <ExpandLess/> : <ExpandMore/>}
+							</div>
+						</ListItemSecondaryAction>
+					</ListItem>
+					<Collapse in={this.state.expanded} className={styles.playDetails}>
+						<div className={styles.pitches}>
+							<Strikezone play={this.props.play}/>
+							<List>
+								{pitchItems}
+							</List>
 						</div>
-					</ListItemSecondaryAction>
-				</ListItem>
-				<Collapse in={this.state.expanded} className={styles.playDetails}>
-					<div className={styles.pitches}>
-						<Strikezone play={this.props.play}/>
-						<List>
-							{pitchItems}
-						</List>
-					</div>
-				</Collapse>
-			</React.Fragment>
+					</Collapse>
+				</>)}
+			</GameDataStoreContext.Consumer>
 		);
 	}
 }

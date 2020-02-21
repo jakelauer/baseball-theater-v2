@@ -43,6 +43,13 @@ class _SettingsDataStore extends DataStore<ISettingsDataStorePayload>
 		});
 	}
 
+	public setDefaultGameTab(tab: GameTabs)
+	{
+		this.update({
+			defaultGameTab: tab
+		});
+	}
+
 	public setHideScores(hideScores: boolean)
 	{
 		this.update({

@@ -51,7 +51,8 @@ export class ContainerProgress extends React.Component<Props, State>
 				height: "100vh",
 				display: "flex",
 				alignItems: "center",
-				justifyContent: "center"
+				justifyContent: "center",
+				pointerEvents: "none"
 			}}>
 				<CircularProgress/>
 			</div>

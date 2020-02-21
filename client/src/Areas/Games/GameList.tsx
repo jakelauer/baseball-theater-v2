@@ -12,6 +12,7 @@ import {MlbUtils} from "baseball-theater-engine/mlbutils";
 import {ContainerProgress} from "../../UI/ContainerProgress";
 import {ISettingsDataStorePayload, SettingsDataStore} from "../../Global/Settings/SettingsDataStore";
 import Helmet from "react-helmet";
+import Typography from "@material-ui/core/Typography";
 
 interface IGameListProps
 {
@@ -137,6 +138,12 @@ export class GameList extends React.Component<Props, State>
 							? <CircularProgress className={styles.progress}/>
 							: gameSummaries
 					}
+
+					{gameSummaries.length === 0 && !this.state.loading && (
+						<div style={{textAlign: "center", width: "100%", marginTop: 100}}>
+							<Typography>No games found</Typography>
+						</div>
+					)}
 				</Grid>
 			</React.Fragment>
 		);

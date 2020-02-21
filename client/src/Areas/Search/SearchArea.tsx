@@ -12,7 +12,8 @@ import {MlbClientDataFetcher} from "../../Global/Mlb/MlbClientDataFetcher";
 import {RouteComponentProps, withRouter} from "react-router";
 import {SiteRoutes} from "../../Global/Routes/Routes";
 import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import {ContainerProgress} from "../../UI/ContainerProgress";
+import Typography from "@material-ui/core/Typography";
 
 interface ISearchAreaParams
 {
@@ -107,20 +108,17 @@ const SearchArea: React.FC<Props> = (props) =>
 				}
 
 				setHighlights([...lastHighlights, ...data]);
+
+				setIsLoading(false);
 			});
 
 			history.replaceState(null, null, SiteRoutes.Search.resolve({query: newText}));
 
-			setIsLoading(false);
-
 		}, 500);
 	};
 
-	const videosOrSkeleton = highlights.length ? highlights : Array(text.length > 2 ? 20 : 0).fill(0);
-
-
-	const highlightsRendered = videosOrSkeleton.map(item => (
-		<Grid key={item.guid} item xs={12} sm={12} md={6} lg={4} xl={3}>
+	const highlightsRendered = highlights.map(item => (
+		<Grid key={item.highlight.guid} item xs={12} sm={12} md={6} lg={4} xl={3}>
 			<Highlight media={item?.highlight} className={styles.highlight} showExtra={true}/>
 		</Grid>
 	));
@@ -156,10 +154,14 @@ const SearchArea: React.FC<Props> = (props) =>
 							Load More
 						</Button>
 					)}
-					{isLoading && (
-						<CircularProgress/>
-					)}
 				</div>
+			)}
+			{isLoading && (
+				<ContainerProgress/>
+			)}
+
+			{!isLoading && highlights.length === 0 && text.length >= 3 && (
+				<Typography>No Highlights Found</Typography>
 			)}
 		</div>
 	);

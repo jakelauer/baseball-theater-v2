@@ -5,9 +5,9 @@ export class GamesUtils
 	public static StartingDate = () =>
 	{
 		const today = moment();
-		const lastSeasonEnd = moment("Oct 30, 2019");
-		const nextOpeningDate = moment("Mar 26, 2020");
+		const lastSeasonEnd = moment("2019-10-30");
+		const nextOpeningDate = moment("2020-02-19");
 
-		return today.isBefore(nextOpeningDate) ? lastSeasonEnd : nextOpeningDate;
+		return nextOpeningDate.isAfter(today) ? lastSeasonEnd : today;
 	}
 }

@@ -13,6 +13,8 @@ import {ISettingsDataStorePayload, SettingsDataStore} from "../../Global/Setting
 import Checkbox from "@material-ui/core/Checkbox";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
+import {GameTabs} from "../../Global/Routes/Routes";
+import Divider from "@material-ui/core/Divider";
 
 interface ISettingsAreaProps
 {
@@ -53,6 +55,11 @@ export default class SettingsArea extends React.Component<Props, State>
 		SettingsDataStore.setFavoriteTeams(event.target.value as (keyof ITeams)[]);
 	};
 
+	private readonly handleGameTabChange = (event: React.ChangeEvent<{ value: unknown }>) =>
+	{
+		SettingsDataStore.setDefaultGameTab(event.target.value as GameTabs);
+	};
+
 	private readonly handleHideScoresChange = (event: React.ChangeEvent<HTMLInputElement>) =>
 	{
 		SettingsDataStore.setHideScores(event.target.checked);
@@ -65,18 +72,26 @@ export default class SettingsArea extends React.Component<Props, State>
 
 	public render()
 	{
+		const gameTabs: { [key in GameTabs]?: string } = {
+			"Highlights": "Highlights",
+			"BoxScore": "Box Score",
+			"LiveGame": "Play-by-play"
+		};
+
 		return (
-			<Container maxWidth={"sm"} style={{marginLeft: 0, paddingTop: "1rem"}}>
+			<Container maxWidth={"sm"} style={{marginLeft: 0, paddingTop: "2rem"}}>
 				<Typography variant={"h4"}>
 					Settings
 				</Typography>
+				<Divider style={{margin: "1rem 0"}}/>
 				<List>
-
-
+					<Typography variant={"h6"} style={{marginTop: "2rem"}}>
+						Game List
+					</Typography>
 					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
 						<ListItemText primary={"Favorite Teams"}/>
 						<ListItemSecondaryAction>
-							<FormControl variant={"filled"} style={{
+							<FormControl variant={"standard"} style={{
 								width: 150
 							}}>
 								<InputLabel id="teamSelect">Team</InputLabel>
@@ -117,6 +132,33 @@ export default class SettingsArea extends React.Component<Props, State>
 								onChange={this.handleHideScoresChange}
 								edge="end"
 							/>
+						</ListItemSecondaryAction>
+					</ListItem>
+
+					<Typography variant={"h6"} style={{marginTop: "2rem"}}>
+						Game Detail
+					</Typography>
+					<ListItem style={{paddingLeft: 0, paddingRight: 0}}>
+						<ListItemText primary={"Default Game Tab"}/>
+						<ListItemSecondaryAction>
+							<FormControl variant={"standard"} style={{
+								width: 150
+							}}>
+								<Select
+									labelId={"teamSelect"}
+									value={this.state.settings.defaultGameTab}
+									style={{
+										width: "100%"
+									}}
+									onChange={this.handleGameTabChange}
+								>
+									{Object.keys(gameTabs).map(tab => (
+										<MenuItem value={tab} style={{padding: 5}}>
+											{gameTabs[tab as GameTabs]}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
 						</ListItemSecondaryAction>
 					</ListItem>
 

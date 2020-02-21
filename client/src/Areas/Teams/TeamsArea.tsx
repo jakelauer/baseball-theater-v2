@@ -59,7 +59,7 @@ export default class TeamsArea extends React.Component<Props, State>
 		const hasPerms = AuthDataStore.hasLevel(BackerType.StarBacker);
 		if (!hasPerms)
 		{
-			return <Upsell levelRequired={BackerType.StarBacker}/>;
+			return <Upsell isModal={false} levelRequired={BackerType.StarBacker}/>;
 		}
 
 		return (

@@ -9,6 +9,7 @@ import {KeyboardArrowLeft, KeyboardArrowRight} from "@material-ui/icons";
 import Fab from "@material-ui/core/Fab";
 import {SiteRoutes} from "../../Global/Routes/Routes";
 import {GamesUtils} from "../../Utility/GamesUtils";
+import {Button} from "@material-ui/core";
 
 interface IGamesAreaParams
 {
@@ -47,7 +48,7 @@ class GamesArea extends React.Component<RouteComponentProps<IGamesAreaParams>, I
 	{
 		const storedDateString = sessionStorage.getItem(GamesArea.SessionStorageDateStringKey);
 
-		const dateString = p.match.params.yyyymmdd || storedDateString || moment("Oct 30, 2019").format("YYYYMMDD");
+		const dateString = p.match.params.yyyymmdd || storedDateString || GamesUtils.StartingDate().format("YYYYMMDD");
 
 		sessionStorage.setItem(GamesArea.SessionStorageDateStringKey, dateString);
 
@@ -86,6 +87,13 @@ class GamesArea extends React.Component<RouteComponentProps<IGamesAreaParams>, I
 		}));
 	};
 
+	private today = () =>
+	{
+		this.props.history.push(SiteRoutes.Games.resolve({
+			yyyymmdd: moment().format("YYYYMMDD")
+		}));
+	};
+
 	public render()
 	{
 		const date = moment(this.state.dateString);
@@ -118,6 +126,11 @@ class GamesArea extends React.Component<RouteComponentProps<IGamesAreaParams>, I
 						<Fab size={"small"} color={"primary"} onClick={this.nextDate}>
 							<KeyboardArrowRight/>
 						</Fab>
+					</div>
+					<div>
+						<Button variant={"text"} style={{marginLeft: "1rem"}} color={"primary"} onClick={this.today}>
+							Today
+						</Button>
 					</div>
 				</div>
 				<div className={styles.gameList}>
